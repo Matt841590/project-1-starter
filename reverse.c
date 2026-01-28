@@ -11,13 +11,15 @@ struct node
   struct node* prev;
 };
 
-// - TODO: handle error cases according to the README
+// - TODONE: handle error cases according to the README
 
-// - TODO: first just make it print the contents of the files
+// - TODONE: first just make it print the contents of the files
 
-// - TODO: uncomment final, head, current, thirdFile as needed
+// - TODONE: uncomment final, head, current, thirdFile as needed
 
-// - TODO address memory leaks
+// - TODO: address memory leaks
+
+// - TODO: Make it so that each return 1 de-allocates all the memory that has been allocated up to then
 
 int main(int argc, char *argv[])
 {
@@ -49,6 +51,8 @@ int main(int argc, char *argv[])
   {
     // - print the error message `usage: reverse <input> <output>`
     fprintf(stderr, "usage: reverse <input> <output>\n");
+    // - deallocate all memeory used untill now
+    // - none applicable
     // - return 1
     return 1;
   }
@@ -62,6 +66,8 @@ int main(int argc, char *argv[])
     if (input == NULL)
     {
       fprintf(stderr, "error: cannot open file: %s \n", argv[1]);
+      // - deallocate memory used untill now
+      // - none applicable
       // - return 1
       return 1;
     }
@@ -77,19 +83,33 @@ int main(int argc, char *argv[])
     // - check for namespace collision between second and third file
       // - make counter
       int i = 0;
-      // - deconstruct strings into chars
-      while(argv[1][i] != '\0' && argv[2][i] != '\0')
+      // - make bool
+      int same = 1;
+
+      // - for every char
+      while (argv[1][i] != '\0' || argv[2][i] != '\0')
       {
-        // - check chars
-        if(argv[1][i] == argv[2][i])
-        {
-          // - handle collision
+          // - if different
+          if (argv[1][i] != argv[2][i])
+          {
+              // - boolean = false
+              same = 0;
+              // - break out of loop
+              break;
+          }
+          // - iterate counter
+          i++;
+      }
+
+      // - check boolean for collision
+      if (same)
+      {
+          // - print error
           fprintf(stderr, "error: input and output file must differ\n");
+          // - deallocate memeory
+          // - none applicable
           // - return 1
           return 1;
-        }
-        // - incriment counter
-        i++;
       }
 
     // - open second filename
@@ -98,6 +118,8 @@ int main(int argc, char *argv[])
     if (input == NULL)
     {
       fprintf(stderr, "error: cannot open file %s: \n", argv[1]);
+      // - deallocate memory used untill now
+      // - none applicable
       // - return 1
       return 1;
     }
@@ -108,6 +130,9 @@ int main(int argc, char *argv[])
     if (output == NULL)
     {
       fprintf(stderr, "error: cannot open file %s: \n", argv[2]);
+      // - deallocate memory used untill now
+      // - input
+      fclose(input);
       // - return 1
       return 1;
     }
@@ -116,20 +141,12 @@ int main(int argc, char *argv[])
   }
 
   // - While readline is still something I can do:
+  __ssize_t nread;
   // - read content using getline as it has malloc in it
-  while((getline(&line, &len, input))!= -1)
+  while((nread=getline(&line, &len, input))!= -1)
   {
     // - fprintf the contents for debugging
     //fprintf(stdout, "%s", line);
-
-    // - testing the malloc inside getline for failure
-    if(line==NULL)
-    {
-      // - printing error message
-      fprintf(stderr, "error: getline malloc failed\n");
-      // - return 1
-      return 1;
-    }
 
     // - allocate a new node object with malloc(sizeof(struct node))
     struct node *new_node = malloc(sizeof(struct node));
@@ -139,6 +156,17 @@ int main(int argc, char *argv[])
     {
       // - printing error message
       fprintf(stderr, "error: node malloc failed\n");
+      // - deallocate memory used untill now
+      // - linked list
+      while(head != NULL)
+      {
+        struct node *tmp = head;
+        head = head->prev;
+        free(tmp->cont);
+        free(tmp);
+      }
+      // - line
+      free(line);
       // - return 1
       return 1;
     }
@@ -161,6 +189,17 @@ int main(int argc, char *argv[])
   {
     // - print error
     fprintf(stderr, "error: cannot open file %s \n", argv[1] );
+    // - deallocate memory used untill now
+    // - linked list
+    while(head != NULL)
+    {
+      struct node *tmp = head;
+      head = head->prev;
+      free(tmp->cont);
+      free(tmp);
+    }
+    // - line
+    free(line);
     // - return 1
     return 1;
   }
@@ -214,7 +253,7 @@ int main(int argc, char *argv[])
   // - close the "line" object i have been using to read stuff in
   free(line);
 
-  // - TODO: comment this out at some point...
-	printf("TODO: write a main function\n");
+  // - TODONE: comment this out at some point...
+	//printf("TODO: write a main function\n");
 	return 0;
 }
