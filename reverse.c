@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/types.h>
+
 
 
 // - TODONE: implement a node struct
@@ -65,7 +67,7 @@ int main(int argc, char *argv[])
     // - handle file open errors
     if (input == NULL)
     {
-      fprintf(stderr, "error: cannot open file: %s \n", argv[1]);
+      fprintf(stderr, "error: cannot open file '%s'\n", argv[1]);
       // - deallocate memory used untill now
       // - none applicable
       // - return 1
@@ -125,7 +127,7 @@ int main(int argc, char *argv[])
     }
 
     // - open third filename
-    output = fopen(argv[2],"r");
+    output = fopen(argv[2],"w");
     // - handle file open errors
     if (output == NULL)
     {
@@ -136,12 +138,10 @@ int main(int argc, char *argv[])
       // - return 1
       return 1;
     }
-    fclose(output);
-    output = fopen(argv[2],"w");
   }
 
   // - While readline is still something I can do:
-  __ssize_t nread;
+  ssize_t nread;
   // - read content using getline as it has malloc in it
   while((nread=getline(&line, &len, input))!= -1)
   {
